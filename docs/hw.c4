@@ -1,0 +1,94 @@
+specification {
+    element person {
+        style {
+            shape person
+            color green
+        }
+    }
+    element softwareSystem
+    element container
+}
+
+model {
+  user = person "Пользователь" "Пользователь Social network"
+
+
+  socNetwork = softwareSystem "Social Network" {
+
+    apiGateway = container "API Gateway" {
+      description "Маршрутизация запросов и управление доступом"
+      technology "Python, FastAPI"
+    }
+
+    webapp = container "Веб-приложение" "Предоставляет интерфейс Social Network" "JavaScript / Python"
+
+    userService = container "User Service" {
+      description "Управление пользователями, регистрация и аутентификация"
+      technology "Python"
+    
+    }
+
+    postCommService = container "Posts and Comments Service" {
+      description "Управление постами и комментариями"
+      technology "Python"
+    }
+
+    analyticsService = container "Analytics Service" {
+      description "Сбор и анализ статистики использования (лайки, просмотры, комментарии)"
+      technology "Python / C++"
+    }
+
+
+    postgresDb_Users = container "PostgreSQL_Users" {
+      description "Хранение данных пользователей"
+      technology "Database"
+      style {
+        shape cylinder
+      }
+    }
+
+    postgresDb_Posts = container "PostgreSQL_Posts" {
+        description "Хранение данных постов"
+        technology "Database"
+        style {
+          shape cylinder
+        }
+    }
+
+    clickhouseDB = container "ClickHouse" {
+        description "Хранение данных о лайках, просмотрах, комментариях"
+        technology "Database"
+        style {
+          shape cylinder
+        }
+    }
+
+    kafka = container "Kafka" {
+      description "Обмен событиями между сервисами"
+      technology "Message Broker"
+      style {
+        shape queue
+      }
+    }
+  }
+
+  user -> socNetwork.webapp "Использует" "HTTPS"
+  socNetwork.webapp -> socNetwork.apiGateway "Перенаправляет запросы" "HTTPS"
+  socNetwork.apiGateway -> socNetwork.userService "Маршрутизирует" "JSON/HTTPS"
+  socNetwork.apiGateway -> socNetwork.postCommService "Маршрутизирует" "JSON/HTTPS"
+  socNetwork.apiGateway -> socNetwork.analyticsService "Маршрутизирует" "JSON/HTTPS"
+
+
+  socNetwork.userService -> socNetwork.postgresDb_Users "Читает/Пишет" "SQL"
+  socNetwork.analyticsService -> socNetwork.clickhouseDB "Читает/Пишет" "SQL"
+  socNetwork.postCommService -> socNetwork.postgresDb_Posts "Читает/Пишет" "SQL"
+
+  socNetwork.postCommService -> socNetwork.kafka "Отправляет события" "posts, comments, views, likes"
+  socNetwork.kafka -> socNetwork.analyticsService "Получает события" "posts, comments, views, likes"
+}
+
+views {
+   view index {
+        include *
+    }
+}
