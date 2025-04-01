@@ -1,0 +1,30 @@
+
+services:
+  postService_db:
+    image: postgres:15
+    container_name: postService_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: mySocNetDB 
+      POSTGRES_PASSWORD: mysecretpass
+    ports:
+      - "5432:5432"
+  post-service:
+    build: ./post_service
+    container_name: post-service
+    depends_on:
+      - postService_db
+    environment:
+      DATABASE_URL: postgresql://postgres:mysecretpass@postService_db:5432/mySocNetDB
+    ports:
+      - "50051:50051"
+
+  api-gateway:
+    build: ./API_gateway
+    container_name: api-gateway
+    depends_on:
+      - post-service
+    environment:
+      POST_SERVICE_URL: post-service:50051
+    ports:
+      - "8000:8000"
