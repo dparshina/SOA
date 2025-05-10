@@ -1,0 +1,221 @@
+openapi: 3.1.0
+info:
+  title: API Gateway
+  version: 0.1.0
+paths:
+  /:
+    get:
+      summary: Root
+      operationId: root__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /posts/:
+    post:
+      summary: Postcreate
+      operationId: postCreate_posts__post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Postslisting
+      operationId: postsListing_posts__get
+      parameters:
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+            title: Offset
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+            title: Limit
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/posts/{post_id}':
+    get:
+      summary: Postget
+      operationId: postGet_posts__post_id__get
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Post Id
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      summary: Postdelete
+      operationId: postDelete_posts__post_id__delete
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Post Id
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Postupdate
+      operationId: postUpdate_posts__post_id__put
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Post Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    PostCreate:
+      properties:
+        title:
+          type: string
+          maxLength: 30
+          minLength: 3
+          title: Title
+          description: 'Заголовок, от 3 до 30 символов'
+        description:
+          type: string
+          maxLength: 100
+          minLength: 10
+          title: Description
+          description: 'Описание, от 10 до 100 символов'
+        user_id:
+          type: integer
+          title: User Id
+        is_private:
+          type: boolean
+          title: Is Private
+        tags:
+          items:
+            type: string
+          type: array
+          title: Tags
+          description: Список тегов
+      type: object
+      required:
+        - title
+        - description
+        - user_id
+        - is_private
+      title: PostCreate
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      title: ValidationError
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
